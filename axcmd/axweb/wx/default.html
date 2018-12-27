@@ -1,0 +1,27 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <script src="http://res.wx.qq.com/connect/zh_CN/htmledition/js/wxLogin.js"></script>
+    
+
+</head>
+<body>
+    <div id="login_container"></div>
+    <script>
+        var obj = new WxLogin({
+            self_redirect: true,
+            id: "login_container",
+            appid: "wxfaa53bb430f420d8",
+            scope: "snsapi_userinfo",
+            redirect_uri: "http://www.axtools1.net/ax/wx/callback.html",
+            state: "STATE",
+            style: "black",
+            href: ""
+        });
+
+    </script>
+
+</body>
+</html>
