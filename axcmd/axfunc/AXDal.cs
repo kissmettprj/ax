@@ -225,6 +225,81 @@ namespace axfunc
             res[1] = "[" + res[1] + "]";
             return res;
         }
+
+        public static string[] getVoteProgress_Hour(SqlConnection conn)
+        {
+            CommonDAL cdal = new CommonDAL(conn);
+            string sql = @" 
+                        select vt,COUNT(1) as cnt from (
+                        select ax_username,
+                        ( CONVERT(varchar(100), MIN(votetime), 23) +' '+ right('0'+cast(   datepart(hh,MIN(votetime)) as nvarchar ),2) )as vt from ax_vote
+                        group by ax_username
+                        ) t
+                        group by vt
+                        order by vt 
+                        ";
+            string[] res = new string[2];
+            res[0] = ""; res[1] = "";
+
+            DataSet dt = cdal.GetDS(sql);
+            for (int i = 0; i < dt.Tables[0].Rows.Count; i++)
+            {
+                res[0] += "\"" + Functions.CleanDBString(dt.Tables[0].Rows[i]["vt"]) + "时\",";
+                res[1] += "" + Functions.CleanDBInt(dt.Tables[0].Rows[i]["cnt"]) + ",";
+            }
+
+            if (res[0].Length > 0) res[0] = res[0].Substring(0, res[0].Length - 1);
+            res[0] = "[" + res[0] + "]";
+            if (res[1].Length > 0) res[1] = res[1].Substring(0, res[1].Length - 1);
+            res[1] = "[" + res[1] + "]";
+            return res;
+        }
+
+        public static string[] getVoterDistribute(SqlConnection conn)
+        {
+            CommonDAL cdal = new CommonDAL(conn);
+            string sql = @" 
+                        select  
+                            Sum(Case When daishou <=100000 Then 1 Else 0 End) As '[0-10w]'
+                            ,Sum(Case When daishou between 100000 and 200000 Then 1 Else 0 End) As '[10-20w]'
+                            ,Sum(Case When daishou between 200000 and 300000 Then 1 Else 0 End) As '[20-30w]'
+                            ,Sum(Case When daishou between 300000 and 500000 Then 1 Else 0 End) As '[30-50w]'
+                            ,Sum(Case When daishou between 500000 and 1000000 Then 1 Else 0 End) As '[50-100w]'
+                            ,Sum(Case When daishou between 1000000 and 2000000 Then 1 Else 0 End) As '[100-200w]'
+                            ,Sum(Case When daishou between 2000000 and 3000000 Then 1 Else 0 End) As '[200-300w]'
+                            ,Sum(Case When daishou between 3000000 and 5000000 Then 1 Else 0 End) As '[300-500w]'
+                            ,Sum(Case When daishou > 5000000 Then 1 Else 0 End) As '[500w+]'
+ 
+                         from ax_user
+                         where ax_username in (select ax_username from ax_vote)
+                        ";
+            string[] res = new string[2];
+            res[0] = ""; res[1] = "";
+
+            DataSet dt = cdal.GetDS(sql);
+            //for (int i = 0; i < dt.Tables[0].Rows.Count; i++)
+            //{
+            //    res[0] += "\"" + Functions.CleanDBString(dt.Tables[0].Rows[i]["vt"]) + "时\",";
+            //    res[1] += "" + Functions.CleanDBInt(dt.Tables[0].Rows[i]["cnt"]) + ",";
+            //}
+
+            string[] fields = { "[0-10w]", "[10-20w]", "[20-30w]", "[30-50w]", "[50-100w]", "[100-200w]", "[200-300w]", "[300-500w]", "[500w+]" };            
+
+            foreach (string field in fields)
+            { 
+                res[0] += "\"" + field + "\",";
+                res[1] += "" + Functions.CleanDBInt(dt.Tables[0].Rows[0][field]) + ",";
+            }
+
+            if (res[0].Length > 0) res[0] = res[0].Substring(0, res[0].Length - 1);
+            res[0] = "[" + res[0] + "]";
+            if (res[1].Length > 0) res[1] = res[1].Substring(0, res[1].Length - 1);
+            res[1] = "[" + res[1] + "]";
+            return res;
+        }
+
+
+
         public static void getVoteTotalSum(SqlConnection conn, out int VoterCount, out double TotalFee)
         {
             CommonDAL cdal = new CommonDAL(conn);

@@ -26,7 +26,7 @@ namespace axweb.vote
                     double TotalFee = 0;
                     AXDal.getVoteTotalSum(conn, out VoterCount, out TotalFee);
 
-                    lTotalFee.Text = TotalFee.ToString();
+                    lTotalFee.Text = TotalFee.ToString("f2");
                     lVoterCount.Text = VoterCount.ToString();
 
                  }
